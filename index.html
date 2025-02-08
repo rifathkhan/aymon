@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Valentine?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: url('real.cur'), auto; /* Replace 'your-cursor.jpg' with your cursor image path */
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-image: url('bgaymon.jpg'); /* Replace with your background image path */
+            background-size: cover;
+            background-position: center;
+            font-family: 'Bellota', cursive;
+            color: #a31525;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .question {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .gif-container {
+            margin: 1rem 0;
+            min-height: 200px;
+        }
+
+        .gif-container img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        button {
+            padding: 1rem 2rem;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 10px;
+            background-color: #FFFAF1;
+            color: #a31525;
+            cursor: pointer;
+            font-family: 'Yeseva One', cursive;
+            transition: transform 0.2s;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            transform: scale(1.1);
+        }
+
+        #no-btn {
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hi Aymon!</h1>
+    <p class="question" id="question">Do you want to be my valentine?</p>
+    <div class="gif-container">
+        <img src="question.gif" id="gif" alt="Valentine's gif"> <!-- Replace with your initial gif path -->
+    </div>
+    <div class="buttons">
+        <button id="yes-btn">Yes</button>
+        <button id="no-btn">No</button>
+    </div>
+
+    <script>
+        const noBtn = document.getElementById('no-btn');
+        const yesBtn = document.getElementById('yes-btn');
+        const question = document.getElementById('question');
+        const gif = document.getElementById('gif');
+        
+        // Array of messages for "No" button
+        const noMessages = [
+            "Are you sure? 🥺",
+            "Pretty please?",
+            "Think again!",
+            "You're breaking my heart 💔",
+            "But we're perfect together!",
+            "Don't be like that!",
+            "Give it another thought!",
+            "You know you want to!",
+            "Is that your final answer?",
+            "But look how cute I am!",
+            "Now I'm getting mad!!"
+        ];
+
+        let currentIndex = 0;
+        let previousPositions = [];
+        
+        // Function to check if a position overlaps with the Yes button
+        function overlapsWithYesButton(x, y, width, height) {
+            const yesRect = yesBtn.getBoundingClientRect();
+            return !(x + width < yesRect.left || 
+                    x > yesRect.right || 
+                    y + height < yesRect.top || 
+                    y > yesRect.bottom);
+        }
+        
+        // Function to get a random position on the screen
+        function getRandomPosition() {
+            const padding = 20; // Minimum distance from screen edges
+            const maxAttempts = 50;
+            let attempts = 0;
+            
+            while (attempts < maxAttempts) {
+                const x = padding + Math.random() * (window.innerWidth - noBtn.offsetWidth - 2 * padding);
+                const y = padding + Math.random() * (window.innerHeight - noBtn.offsetHeight - 2 * padding);
+                
+                // Check if position overlaps with Yes button
+                if (!overlapsWithYesButton(x, y, noBtn.offsetWidth, noBtn.offsetHeight)) {
+                    // Check if position is different enough from previous positions
+                    if (previousPositions.length === 0 || previousPositions.every(pos => 
+                        Math.abs(pos.x - x) > 100 || Math.abs(pos.y - y) > 100)) {
+                        // Store new position
+                        previousPositions.push({x, y});
+                        if (previousPositions.length > 5) previousPositions.shift();
+                        return {x, y};
+                    }
+                }
+                attempts++;
+            }
+            
+            // Fallback position if we can't find a good spot
+            return {
+                x: Math.random() < 0.5 ? padding : window.innerWidth - noBtn.offsetWidth - padding,
+                y: Math.random() * (window.innerHeight - noBtn.offsetHeight - 2 * padding) + padding
+            };
+        }
+
+        // Make the "No" button move to random positions
+        noBtn.addEventListener('mouseover', () => {
+            const newPos = getRandomPosition();
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = `${newPos.x}px`;
+            noBtn.style.top = `${newPos.y}px`;
+            noBtn.textContent = noMessages[currentIndex];
+            currentIndex = (currentIndex + 1) % noMessages.length;
+        });
+        // Handle "Yes" button click
+        yesBtn.addEventListener('click', () => {
+            question.textContent = "I can't wait to spend Valentines day with the most beautiful kind gf everrrr!!!";
+            gif.src = 'yay.gif'; // Replace with your success gif path
+            noBtn.style.display = 'none';
+            yesBtn.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
